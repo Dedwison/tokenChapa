@@ -1,19 +1,17 @@
 "use client"
 import React, {useState} from "react";
+import { tokenChapa_backend } from '../../../declarations/tokenChapa_backend';
 
 export default function Faucet() {
-    const [isLoading, setIsLoading] = useState(false)
+    const [buttonText, setButtonText] = useState("Obtener")
     const [success, setSuccess] = useState(false)
+    const [isDisabled, setDisabled] = useState(false)
 
-    const handleClick = (e) => {
-        setIsLoading(true)
-        // Simulate API call
-        setTimeout(() => {
-        setIsLoading(false)
-        setSuccess(true)
-        // Reset success message after 3 seconds
-        setTimeout(() => setSuccess(false), 3000)
-        }, 1000)
+    const handleClick = async (e) => {
+        setDisabled(true)
+        const result =await tokenChapa_backend.payOut()
+        setButtonText(result)
+        setDisabled(false)
     }
     return (
         <div>
@@ -25,7 +23,7 @@ export default function Faucet() {
             </h2>
             <label>Obtén GRATIS tus primeras CHAPA tokens aquí! Solicita 10.000 CHAPA tokens en tu cuenta de identidad</label>
             <p className="trade-buttons">
-                <button id="btn-payout" onClick={handleClick} disabled={isLoading}>{isLoading ? "Procesando..." : "Obtener"}</button>
+                <button id="btn-payout" onClick={handleClick} disabled={isDisabled}>{buttonText}</button>
             </p>
             {success && <p className="balance-display">¡Éxito! Has recibido 10.000 CHAPA tokens.</p>}
         </div>
