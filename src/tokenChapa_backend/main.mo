@@ -1,6 +1,7 @@
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
+import Debug "mo:base/Debug";
 
 
 actor TokenChapa { 
@@ -14,7 +15,7 @@ actor TokenChapa {
 
   private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
 
-  public query func balaceOf(who: Principal): async Nat {
+  public query func balanceOf(who: Principal): async Nat {
     let balance: Nat = switch(balances.get(who)) {
       case null 0;
       case (?result) result;
@@ -23,6 +24,34 @@ actor TokenChapa {
     return balance;
   };
 
+  public shared({caller}) func payOut(): async Text {
+    Debug.print(debug_show(caller));
+    let amount: Nat = 10000;
+
+    if(balances.get(caller) == null) {
+      let result = await transfer(caller, amount);
+
+      return result;
+    } else {
+      return "Already Claimed";
+    };
+  };
+
+  public shared({caller}) func transfer(to: Principal, amount: Nat): async Text {
+    let fromBalance = await balanceOf(caller);
+    if(fromBalance > amount) {
+      let newFromBalance: Nat = fromBalance - amount;
+      balances.put(caller, newFromBalance);
+
+      let toBalance = await balanceOf(to);
+      let newToBalance = toBalance + amount;
+      balances.put(to, newToBalance);
+
+      return "Success";
+    } else {
+      return "Indufficient Funds";
+    };
+  };
 
 
 };
