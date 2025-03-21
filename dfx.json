@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "tokenChapa_backend": {
+      "main": "src/tokenChapa_backend/main.mo",
+      "type": "motoko"
+    },
+    "tokenChapa_frontend": {
+      "dependencies": [
+        "tokenChapa_backend"
+      ],
+      "source": [
+        "src/tokenChapa_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "tokenChapa_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
