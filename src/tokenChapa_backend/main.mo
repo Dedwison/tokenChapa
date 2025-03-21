@@ -2,6 +2,7 @@ import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
+import Iter "mo:base/Iter";
 
 
 actor TokenChapa { 
@@ -10,10 +11,16 @@ actor TokenChapa {
   // Suministro total de tokens
   let totalSuply: Nat = 1000000000;
   // Simbolo del token
-  let symbol: Text = "CHAPA";
+  let _symbol: Text = "CHAPA";
 
+  // Almacena los saldos durante las actualizaciones del caniser
+  private stable var balanceEntries: [(Principal, Nat)] = [];
   // Almcena los saldos de cada usuario
   private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
+  // Si el HashMap está vacío, asigna todo el suministro al propietario
+  if(balances.size() < 1) {
+    balances.put(owner, totalSuply);
+  };
   
   // Obtiene el saldo del usuario
   public query func balanceOf(who: Principal): async Nat {
@@ -61,5 +68,21 @@ actor TokenChapa {
     };
   };
 
+  public shared({caller}) func whoAmI(): async Principal {
+    return caller;
+  };
 
+  // Se ejecuta antes de actualizar el canister
+  system func preupgrade() {
+    // Convierte el HashMap de saldos a un array para persistencia
+    balanceEntries := Iter.toArray(balances.entries());
+  };
+
+  // Se ejecuta después de actualizar el canister
+  system func postupgrade() {
+    // Si el HashMap está vacío, asigna todo el suministro al propietario
+    if(balances.size() < 1) {
+      balances.put(owner, totalSuply);
+    };
+  };
 };
