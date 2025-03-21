@@ -1,13 +1,24 @@
 "use client"
 import React, {useState} from "react";
+import { Principal } from "@dfinity/principal";
+import { tokenChapa_backend } from '../../../declarations/tokenChapa_backend';
 
 export default function Balance() {
-    const [balance, setBalance] = useState(null)
+    const [inputValue, setInput] = useState("");
+    const [balanceResult, setBalance] = useState("");
+    const [balanceCompute, setBalanceCompute] = useState("");
+    const [symbolToken, setSymbol] = useState("");
+    const [isHidden, setHidden] = useState(true);
 
     const handleClick = async () => {
-        console.log("boton cliqueado")
-        // Simulate balance check (replace with actual implementation)
-        setBalance("10,000")
+        // console.log(inputValue)
+        const principal = Principal.fromText(inputValue);
+        const balance = await tokenChapa_backend.balanceOf(principal);
+        const symbol = await tokenChapa_backend.getSymbol();
+        setSymbol(symbol)
+        setBalance(balance.toLocaleString());
+        setBalanceCompute(Number(balance));
+        setHidden(false);
     }
 
     return (
@@ -18,12 +29,14 @@ export default function Balance() {
                 </span>
                 Balance
             </h2>
-            <label>ingresa la cuenta para revisar el balance de tokens:</label>
+            <label>Ingresa la cuenta para consultar el balance de tokens:</label>
             <p>
                 <input 
                     id="balance-principal-id"
                     type="text"
                     placeholder="Escribe un Principal ID"
+                    value={inputValue}
+                    onChange={(e)=> setInput(e.target.value)}
                 />
             </p>
             <p className="trade-buttons">
@@ -31,14 +44,12 @@ export default function Balance() {
                     id="btn-request-balance"
                     onClick={handleClick}
                 >
-                Revisar Balance
+                Consultar Balance
                 </button>
             </p>
-            {balance && (
-                <p className="balance-display">
-                    Esta cuenta tiene un balance de <strong>{balance}</strong> CHAPA
-                </p>
-            )}
+            <p className="balance-display" hidden={isHidden}>
+                Esta cuenta tiene un balance de <strong>{balanceResult}</strong> {symbolToken}{balanceCompute>1?"S":""}
+            </p>
         </div>
     );
 };

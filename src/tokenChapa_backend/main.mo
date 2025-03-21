@@ -11,7 +11,11 @@ actor TokenChapa {
   // Suministro total de tokens
   let totalSuply: Nat = 1000000000;
   // Simbolo del token
-  let _symbol: Text = "CHAPA";
+  let symbol: Text = "CHAPA";
+
+  public query func getSymbol(): async Text {
+    return symbol;
+  };
 
   // Almacena los saldos durante las actualizaciones del caniser
   private stable var balanceEntries: [(Principal, Nat)] = [];
