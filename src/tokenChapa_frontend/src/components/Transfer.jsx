@@ -1,19 +1,26 @@
 "use client"
 import React, {useState} from "react";
+import { Principal } from "@dfinity/principal";
+import { tokenChapa_backend } from '../../../declarations/tokenChapa_backend';
 
 export default function Tranfer() {
-    const [isLoading, setIsLoading] = useState(false)
-    const [success, setSuccess] = useState(false)
+    const [recipientId, setId] = useState("")
+    const [amount, setAmount] = useState("")
+    const [isDisabled, setDisabled] = useState(false)
+    const [feedback, setFeedback] = useState("")
+    const [isHidden, setHidden] = useState(true)
 
-    const handleClick = () => {
-        setIsLoading(true)
-        // Simulate API call
-        setTimeout(() => {
-          setIsLoading(false)
-          setSuccess(true)
-          // Reset success message after 3 seconds
-          setTimeout(() => setSuccess(false), 3000)
-        }, 1000)
+    const handleClick = async () => {
+        setHidden(true)
+        setDisabled(true);
+        const recipient = Principal.fromText(recipientId);
+        const amountToTransfer = Number(amount);
+        const result = await tokenChapa_backend.transfer(recipient, amountToTransfer);
+        console.log(result)
+        setFeedback(result);
+        setHidden(false)
+        setDisabled(false);
+        
     };
 
     return(
@@ -31,6 +38,8 @@ export default function Tranfer() {
                             <input 
                                 type="text"
                                 id="transfer-to-id"
+                                value={recipientId}
+                                onChange={(e) => setId(e.target.value)}
                                 />
                         </li>
                     </ul>
@@ -42,16 +51,20 @@ export default function Tranfer() {
                             <input 
                                 type="text"
                                 id="amount"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
                                 />
                         </li>
                     </ul>
                 </fieldset>
                 <p className="trade-buttons">
-                    <button id="btn-transfer" onClick={handleClick} disabled={isLoading}>
-                        {isLoading ? "Procesando..." : "Transferir"}
+                    <button id="btn-transfer" onClick={handleClick} disabled={isDisabled}>
+                        Transferir
                     </button>
                 </p>
-                {success && <p className="balance-display">¡Transferencia completada con éxito!</p>}
+            
+                <p className="balance-display" hidden={isHidden}>{feedback == "Success" ? "¡Transferencia completada con éxito!" : "No tienes fondo suficiente"}</p>
+
             </div>
     )
 };
