@@ -1,7 +1,8 @@
 "use client"
 import React, {useState} from "react";
 import { Principal } from "@dfinity/principal";
-import { tokenChapa_backend } from '../../../declarations/tokenChapa_backend';
+import { tokenChapa_backend, canisterId, createActor } from '../../../declarations/tokenChapa_backend';
+// import { AuthClient } from "@dfinity/auth-client";
 
 export default function Tranfer() {
     const [recipientId, setId] = useState("")
@@ -13,8 +14,21 @@ export default function Tranfer() {
     const handleClick = async () => {
         setHidden(true)
         setDisabled(true);
+
         const recipient = Principal.fromText(recipientId);
         const amountToTransfer = Number(amount);
+
+         // const authClient = await AuthClient.create();
+        // const identity = await authClient.getIdentity();
+
+        // const authenticatedCanister = createActor(canisterId, {
+        //     agentOptions: {
+        //         identity,
+
+        //     },
+        // });
+
+        // const result = await authenticatedCanister.transfer(recipient, amountToTransfer);
         const result = await tokenChapa_backend.transfer(recipient, amountToTransfer);
         console.log(result)
         setFeedback(result);

@@ -25,6 +25,10 @@
     color: var(--text);
     line-height: 1.6;
   }
+
+  #dev {
+    color: yellow;
+  }
   
   #screen {
     max-width: 1200px;

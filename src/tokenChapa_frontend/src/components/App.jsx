@@ -7,13 +7,13 @@ import Footer from './Footer';
 import "../styles.css"
 import { tokenChapa_backend } from 'declarations/tokenChapa_backend';
 
-function App() {
+function App(props) {
 
   return (
     <div id='screen'>
       <Header />
       <div className="component-container">
-        <Faucet />
+        <Faucet userPrincipal={props.userPrincipal} />
       </div>
       <div className="component-container">
         <Balance />

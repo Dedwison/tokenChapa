@@ -14,7 +14,7 @@ export default function Footer() {
                             <p>Facilitamos la inversión y el intercambio de tokens CHAPA en un ecosistema seguro y transparente. Participa en nuestra oferta inicial y forma parte del futuro de las finanzas descentralizadas.</p>
                         </Col>
                         <Col md={4} className="text-md-end mt-4 mt-md-0">
-                            <p>Desarrollo por Dedwison Alvarez Copyright ©2025</p>
+                            <p id="dev">Desarrollado por Dedwison Alvarez Copyright ©2025</p>
                         </Col>
                     </Row>
                 </Container>
