@@ -18,11 +18,6 @@ actor class TokenChapa() = self {
     return symbol;
   };
 
-    // Obtiene el Principal del Canister
-  public query func get_canister_id(): async Principal {
-    return Principal.fromActor(self);
-  };
-
    public shared({caller}) func whoAmI(): async Principal {
     return caller;
   };
