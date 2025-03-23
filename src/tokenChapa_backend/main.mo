@@ -1,5 +1,4 @@
 import Principal "mo:base/Principal";
-import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
 import Map "mo:map/Map";
 import { phash } "mo:map/Map"
@@ -8,10 +7,10 @@ import { phash } "mo:map/Map"
 actor class TokenChapa() = self { 
   // Propietario del token
   let owner: Principal = Principal.fromText("zsqst-kaz4z-cih4c-wcz32-c5sna-qtjje-d76zl-j3nma-ujppk-lemoq-fae");
-  let canister: Principal = Principal.fromActor(self);
+   let canister: Principal = Principal.fromActor(self); 
   // Suministro total de tokens
-  let _totalSuply: Nat = 1000000000;
-  let halfSuply: Nat = 500000000;
+  let _totalSuply: Nat = 1_000_000_000;
+  let halfSuply: Nat = 500_000_000;
   // Simbolo del token
   let symbol: Text = "CHAPA";
 
@@ -50,7 +49,7 @@ actor class TokenChapa() = self {
   // faucet
   public shared({caller}) func payOut(): async Text {
     Debug.print(debug_show(caller));
-    let amount: Nat = 10000;
+    let amount: Nat = 10_000;
 
     if(Map.get<Principal, Nat>(balances, phash, caller) == null) {
       let result = await transfer(caller, amount);
