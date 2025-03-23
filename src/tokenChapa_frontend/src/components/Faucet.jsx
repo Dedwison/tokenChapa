@@ -35,8 +35,8 @@ export default function Faucet(props) {
                 Faucet
             </h2>
             <p>Obtén GRATIS tus primeras CHAPA tokens!</p>
-            {/* <label><i>Solicita 10.000 CHAPA tokens en tu cuenta de identidad {props.userPrincipal}</i></label> */}
-            <label><i>Solicita 10.000 CHAPA tokens en tu cuenta de identidad</i></label>
+            <label><i>Solicita 10.000 CHAPA tokens en tu cuenta de identidad <span style={{color:"white"}}>{props.userPrincipal}</span></i></label>
+            {/* <label><i>Solicita 10.000 CHAPA tokens en tu cuenta de identidad</i></label> */}
             <p className="trade-buttons">
                 <button id="btn-payout" onClick={handleClick} disabled={isDisabled}>{buttonText}</button>
             </p>

@@ -1,15 +1,19 @@
 import Principal "mo:base/Principal";
-import HashMap "mo:base/HashMap";
+//* import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
-import Iter "mo:base/Iter";
+//* import Iter "mo:base/Iter";
+import Map "mo:map/Map";
+import { phash } "mo:map/Map"
 
 
-actor TokenChapa { 
+actor class TokenChapa() = self { 
   // Propietario del token
   let owner: Principal = Principal.fromText("zsqst-kaz4z-cih4c-wcz32-c5sna-qtjje-d76zl-j3nma-ujppk-lemoq-fae");
+  let canister: Principal = Principal.fromActor(self);
   // Suministro total de tokens
-  let totalSuply: Nat = 1000000000;
+  let _totalSuply: Nat = 1000000000;
+  let halfSuply: Nat = 500000000;
   // Simbolo del token
   let symbol: Text = "CHAPA";
 
@@ -18,17 +22,28 @@ actor TokenChapa {
   };
 
   // Almacena los saldos durante las actualizaciones del caniser
-  private stable var balanceEntries: [(Principal, Nat)] = [];
+  //* private stable var balanceEntries: [(Principal, Nat)] = [];
   // Almcena los saldos de cada usuario
-  private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
+  //* private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
+  private stable var balances  = Map.new<Principal, Nat>();
   // Si el HashMap está vacío, asigna todo el suministro al propietario
-  if(balances.size() < 1) {
-    balances.put(owner, totalSuply);
+  //* if(balances.size() < 1) {
+  if(Map.size<Principal, Nat>(balances) < 1) {
+    //* balances.put(owner, halfSuply);
+    //* balances.put(canister, halfSuply);
+    ignore Map.put<Principal, Nat>(balances, phash, owner, halfSuply);
+    ignore Map.put<Principal, Nat>(balances, phash, canister, halfSuply);
+  };
+
+  // Obtiene el Principal del Canister
+  public query func get_canister_id(): async Principal {
+    return Principal.fromActor(self);
   };
   
   // Obtiene el saldo del usuario
   public query func balanceOf(who: Principal): async Nat {
-    let balance: Nat = switch(balances.get(who)) {
+    //* let balance: Nat = switch(balances.get(who)) {
+    let balance: Nat = switch(Map.get<Principal, Nat>(balances, phash, who)) {
       case null 0;
       case (?result) result;
     };
@@ -38,10 +53,11 @@ actor TokenChapa {
 
   // faucet
   public shared({caller}) func payOut(): async Text {
-    Debug.print(debug_show(caller));
+    // Debug.print(debug_show(caller));
     let amount: Nat = 10000;
 
-    if(balances.get(caller) == null) {
+    //* if(balances.get(caller) == null) {
+    if(Map.get<Principal, Nat>(balances, phash, caller) == null) {
       let result = await transfer(caller, amount);
 
       return result;
@@ -57,14 +73,16 @@ actor TokenChapa {
       // Calcula el nuevo saldo del remitente
       let newFromBalance: Nat = fromBalance - amount;
       // Actualiza el saldo del remitente
-      balances.put(caller, newFromBalance);
+      //* balances.put(caller, newFromBalance);
+      ignore Map.put<Principal, Nat>(balances, phash, caller, newFromBalance);
 
       // Obtiene el saldo del destinatario
       let toBalance = await balanceOf(to);
       // Calcula el nuevo saldo del destinatario
       let newToBalance = toBalance + amount;
       // Actualiza el saldo del destinatario
-      balances.put(to, newToBalance);
+      //* balances.put(to, newToBalance);
+      ignore Map.put<Principal, Nat>(balances, phash, to, newToBalance);
 
       return "Success";
     } else {
@@ -76,17 +94,18 @@ actor TokenChapa {
     return caller;
   };
 
-  // Se ejecuta antes de actualizar el canister
-  system func preupgrade() {
+  // Se ejecuta antes de actualizar el canister - limit 400GB memmory heap
+  // system func preupgrade() {
     // Convierte el HashMap de saldos a un array para persistencia
-    balanceEntries := Iter.toArray(balances.entries());
-  };
+    // balanceEntries := Iter.toArray(balances.entries());
+  // };
 
   // Se ejecuta después de actualizar el canister
-  system func postupgrade() {
+  // system func postupgrade() {
     // Si el HashMap está vacío, asigna todo el suministro al propietario
-    if(balances.size() < 1) {
-      balances.put(owner, totalSuply);
-    };
-  };
+  //   if(balances.size() < 1) {
+  //     balances.put(owner, halfSuply);
+  //     balances.put(canister, halfSuply);
+  //   };
+  // };
 };

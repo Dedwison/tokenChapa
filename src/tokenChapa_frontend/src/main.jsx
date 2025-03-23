@@ -22,8 +22,8 @@ const init = async () => {
 
 const handleAuthenticated = async(authClient) => {
   const identity = await authClient.getIdentity();
-  const userPrincipal = identity._principal.toString();
-  console.log(userPrincipal)
+  const userPrincipal = await identity.getPrincipal().toString();
+
 
   ReactDOM.createRoot(document.getElementById('root')).render(
         

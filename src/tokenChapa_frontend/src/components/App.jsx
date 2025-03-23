@@ -13,7 +13,7 @@ function App(props) {
     <div id='screen'>
       <Header />
       <div className="component-container">
-        <Faucet userPrincipal={props.userPrincipal} />
+        <Faucet userPrincipal={props.loggedInPrincipal} />
       </div>
       <div className="component-container">
         <Balance />
