@@ -1,11 +1,13 @@
 "use client"
 import React, {useState} from "react";
+import Confetti from 'react-confetti';
 import { tokenChapa_backend, canisterId, createActor } from '../../../declarations/tokenChapa_backend';
 // import { AuthClient } from "@dfinity/auth-client";
 
 export default function Faucet(props) {
     const [buttonText, setButtonText] = useState("Obtener")
     const [isDisabled, setDisabled] = useState(false)
+    const [showConfetti, setShowConfetti] = useState(false);
 
     const handleClick = async (e) => {
         setDisabled(true)
@@ -23,6 +25,11 @@ export default function Faucet(props) {
         // const response =await authenticatedCanister.payOut()
         const response =await tokenChapa_backend.payOut()
         const result = response == "Success" ? "Depositados" : "Ya has recibido tus tokens"
+        if (response == "Success"){
+            console.log("CONFETTI")
+            setShowConfetti(true); 
+            setTimeout(() => setShowConfetti(false), 3000);
+        }
         setButtonText(result)
         setDisabled(false)
     }
@@ -40,6 +47,15 @@ export default function Faucet(props) {
             <p className="trade-buttons">
                 <button id="btn-payout" onClick={handleClick} disabled={isDisabled}>{buttonText}</button>
             </p>
+            {showConfetti && (
+                <Confetti
+                width={window.innerWidth}
+                height={window.innerHeight}
+                numberOfPieces={300}
+                gravity={0.3}
+                decay={0.95}
+                />
+            )}
         </div>
     )
 }

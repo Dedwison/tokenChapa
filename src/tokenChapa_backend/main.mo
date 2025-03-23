@@ -1,8 +1,6 @@
 import Principal "mo:base/Principal";
-//* import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
-//* import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import { phash } "mo:map/Map"
 
@@ -21,28 +19,26 @@ actor class TokenChapa() = self {
     return symbol;
   };
 
-  // Almacena los saldos durante las actualizaciones del caniser
-  //* private stable var balanceEntries: [(Principal, Nat)] = [];
-  // Almcena los saldos de cada usuario
-  //* private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
-  private stable var balances  = Map.new<Principal, Nat>();
-  // Si el HashMap está vacío, asigna todo el suministro al propietario
-  //* if(balances.size() < 1) {
-  if(Map.size<Principal, Nat>(balances) < 1) {
-    //* balances.put(owner, halfSuply);
-    //* balances.put(canister, halfSuply);
-    ignore Map.put<Principal, Nat>(balances, phash, owner, halfSuply);
-    ignore Map.put<Principal, Nat>(balances, phash, canister, halfSuply);
-  };
-
-  // Obtiene el Principal del Canister
+    // Obtiene el Principal del Canister
   public query func get_canister_id(): async Principal {
     return Principal.fromActor(self);
+  };
+
+   public shared({caller}) func whoAmI(): async Principal {
+    return caller;
+  };
+
+  // Almcena los saldos de cada usuario 
+  private stable var balances  = Map.new<Principal, Nat>();
+  
+  // Si el HashMap está vacío, asigna todo el suministro al propietario
+  if(Map.size<Principal, Nat>(balances) < 1) {
+    ignore Map.put<Principal, Nat>(balances, phash, owner, halfSuply);
+    ignore Map.put<Principal, Nat>(balances, phash, canister, halfSuply);
   };
   
   // Obtiene el saldo del usuario
   public query func balanceOf(who: Principal): async Nat {
-    //* let balance: Nat = switch(balances.get(who)) {
     let balance: Nat = switch(Map.get<Principal, Nat>(balances, phash, who)) {
       case null 0;
       case (?result) result;
@@ -53,10 +49,9 @@ actor class TokenChapa() = self {
 
   // faucet
   public shared({caller}) func payOut(): async Text {
-    // Debug.print(debug_show(caller));
+    Debug.print(debug_show(caller));
     let amount: Nat = 10000;
 
-    //* if(balances.get(caller) == null) {
     if(Map.get<Principal, Nat>(balances, phash, caller) == null) {
       let result = await transfer(caller, amount);
 
@@ -73,7 +68,6 @@ actor class TokenChapa() = self {
       // Calcula el nuevo saldo del remitente
       let newFromBalance: Nat = fromBalance - amount;
       // Actualiza el saldo del remitente
-      //* balances.put(caller, newFromBalance);
       ignore Map.put<Principal, Nat>(balances, phash, caller, newFromBalance);
 
       // Obtiene el saldo del destinatario
@@ -81,7 +75,6 @@ actor class TokenChapa() = self {
       // Calcula el nuevo saldo del destinatario
       let newToBalance = toBalance + amount;
       // Actualiza el saldo del destinatario
-      //* balances.put(to, newToBalance);
       ignore Map.put<Principal, Nat>(balances, phash, to, newToBalance);
 
       return "Success";
@@ -89,23 +82,4 @@ actor class TokenChapa() = self {
       return "Indufficient Funds";
     };
   };
-
-  public shared({caller}) func whoAmI(): async Principal {
-    return caller;
-  };
-
-  // Se ejecuta antes de actualizar el canister - limit 400GB memmory heap
-  // system func preupgrade() {
-    // Convierte el HashMap de saldos a un array para persistencia
-    // balanceEntries := Iter.toArray(balances.entries());
-  // };
-
-  // Se ejecuta después de actualizar el canister
-  // system func postupgrade() {
-    // Si el HashMap está vacío, asigna todo el suministro al propietario
-  //   if(balances.size() < 1) {
-  //     balances.put(owner, halfSuply);
-  //     balances.put(canister, halfSuply);
-  //   };
-  // };
 };
